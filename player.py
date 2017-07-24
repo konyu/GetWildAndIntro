@@ -14,5 +14,5 @@ class Player:
         self.player.time_pos = firs_get_wild_seek
         self.player.pause()
         # player.play()
-        time.sleep(0.1)
+        time.sleep(8)
         self.player.pause()
