@@ -51,7 +51,7 @@ class SampleApp(tk.Tk):
         self.correction_num = 0
         self.sum_quiz_num = 0
 
-        for F in (StartPage, IntroPage, ResultPage):
+        for F in (StartPage, IntroPage, ResultPage, MiddlePage):
             page_name = F.__name__
             frame = F(parent=container, controller=self)
             self.frames[page_name] = frame
@@ -70,14 +70,16 @@ class SampleApp(tk.Tk):
             return False
 
 
-    def show_frame(self, page_name, arg=None):
+    def show_frame(self, page_name, arg=None, ans=None):
         '''Show a frame for the given page name'''
         frame = self.frames[page_name]
         frame.tkraise()
-        if page_name == "IntroPage" and arg:
+        if page_name == "IntroPage":
             frame.create_quiz(arg)
         elif page_name == "ResultPage":
             frame.show_result()
+        elif page_name == "MiddlePage":
+            frame.show_result(arg, ans)
 
 
 class StartPage(tk.Frame):
@@ -116,7 +118,7 @@ class IntroPage(tk.Frame):
             # btn_text = tk.StringVar()
             # btn_text.set("-------------AAA")
             # self.selection_texts.append(btn_text)
-            btn = tk.Button(self, text="-------------AAA", pady=10, font=tkfont.Font(size=15))
+            btn = tk.Button(self, text="-------------", pady=10, font=tkfont.Font(size=15))
             # btn = tk.Button(self, textvariable=btn_text)
             # self.selections[i].command =
             self.selections.append(btn)
@@ -151,12 +153,6 @@ class IntroPage(tk.Frame):
             self.play()
             # import pdb; pdb.set_trace()
             # else:
-            text = "%s問中%s正解" % (self.controller.sum_quiz_num, self.controller.correction_num)
-            if(arg == "correct"):
-                self.label.config(text= "正解！！！" + text)
-            elif(arg == "incorrect"):
-                self.label.config(text= "不正解！！"+ text)
-
 
     # 回答する
     def ans(self, answer):
@@ -175,7 +171,7 @@ class IntroPage(tk.Frame):
         if(self.controller.is_end()):
             self.controller.show_frame("ResultPage")
         else:
-            self.controller.show_frame("IntroPage", result)
+            self.controller.show_frame("MiddlePage", result, answer)
 
         return "answer"
 
@@ -183,6 +179,34 @@ class IntroPage(tk.Frame):
         print(self.answer_wild.title + " " + self.answer_wild.artist)
         a=Player('getwilds')
         a.playWild(self.answer_wild.file_name, self.answer_wild.firs_get_wild_seek)
+
+class MiddlePage(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+        self.label = tk.Label(self, text="", font=controller.title_font)
+        self.label.pack(side="top", fill="x", pady=10)
+
+        self.label2 = tk.Label(self, text="正解は", font=controller.title_font)
+        self.label2.pack(side="top", fill="x", pady=10)
+        #
+        self.label3 = tk.Label(self, text="", font=controller.title_font)
+        self.label3.pack(side="top", fill="x", pady=10)
+
+        self.label4 = tk.Label(self, text="でした", font=controller.title_font)
+        self.label4.pack(side="top", fill="x", pady=10)
+
+        button = tk.Button(self, text="Next",
+                           command=lambda: controller.show_frame("IntroPage"))
+        button.pack()
+
+    def show_result(self, result, ans):
+        text = "%s問中%s正解" % (self.controller.sum_quiz_num, self.controller.correction_num)
+        if(result == "correct"):
+            self.label.config(text= "正解！！！" + text)
+        elif(result == "incorrect"):
+            self.label.config(text= "不正解！！"+ text)
+        self.label3.config(text=ans)
 
 
 class ResultPage(tk.Frame):
@@ -203,7 +227,7 @@ class ResultPage(tk.Frame):
         button.pack()
 
     def show_result(self):
-        result = "残念！"
+        result = "You are just Mild. ¯\_(ツ)_/¯ "
         if(self.controller.correction_num >= 5):
             result = "You are WILD!!!"
         self.label2.config(text=result)
@@ -218,40 +242,17 @@ class ResultPage(tk.Frame):
 
 if __name__ == "__main__":
     app = SampleApp()
+    app.overrideredirect(True)
+    app.overrideredirect(False)
+    app.attributes('-fullscreen',True)
     app.mainloop()
+    # app.geometry("400x300")
+    #app.attributes("-fullscreen", True)
 
-# # ------------
-# def onBackButton():
-#     a=Player('getwilds')
-#     answer_wild = select_answer_wild()
-#     # 適当な終了処理
-#     if answer_wild is None:
-#         print("AAAAAAAAAa")
-#         return
-#     else:
-#         print(answer_wild.title + " " + answer_wild.artist)
-#         print("------------")
-#         for wild in select_choices_wild():
-#             print(wild.title + " " + wild.artist)
-#         print("============")
-#
-#         a.playWild(answer_wild.file_name, answer_wild.firs_get_wild_seek)
-# # ------------
-#
-# root = Tk()
-#
+
 # #-----------------
 # root.title("日本語Get Wild")
 #
 # # フルスクリーン化
 # #root.attributes("-fullscreen", True)
 # root.geometry("400x300")
-#
-# #ボタン
-# btnframe = ttk.Frame(root)
-# btn = ttk.Button(btnframe, text='にほんごでOk ', command=onBackButton)
-#
-# btnframe.grid()
-# btn.grid()
-# #------
-# root.mainloop()
