@@ -64,7 +64,7 @@ class SampleApp(tk.Tk):
         self.show_frame("StartPage")
 
     def is_end(self):
-        if(self.correction_num >= 5 or self.sum_quiz_num >= 10):
+        if(self.correction_num >= 5 or self.sum_quiz_num >= 2):
             return True
         else:
             return False
@@ -76,6 +76,8 @@ class SampleApp(tk.Tk):
         frame.tkraise()
         if page_name == "IntroPage" and arg:
             frame.create_quiz(arg)
+        elif page_name == "ResultPage":
+            frame.show_result()
 
 
 class StartPage(tk.Frame):
@@ -86,9 +88,9 @@ class StartPage(tk.Frame):
         label = tk.Label(self, text="Get Wild イントロ", font=controller.title_font)
         label.pack(side="top", fill="x", pady=10)
 
-        button2 = tk.Button(self, text="Start",
+        button2 = tk.Button(self, text="Start", font=tkfont.Font(size=20),
                             command=lambda: controller.show_frame("IntroPage", "play"))
-        button2.pack()
+        button2.pack(fill='y', expand=1)
 
 
 class IntroPage(tk.Frame):
@@ -104,9 +106,9 @@ class IntroPage(tk.Frame):
         # if(self.btn_play.winfo_exists() == False):
         self.btn_play.pack()
 
-        button = tk.Button(self, text="Go to the start page",
-                           command=lambda: controller.show_frame("StartPage"))
-        button.pack()
+        # button = tk.Button(self, text="Go to the start page",
+        #                    command=lambda: controller.show_frame("StartPage"))
+        # button.pack()
 
         self.selections = []
         # self.selection_texts = []
@@ -114,11 +116,11 @@ class IntroPage(tk.Frame):
             # btn_text = tk.StringVar()
             # btn_text.set("-------------AAA")
             # self.selection_texts.append(btn_text)
-            btn = tk.Button(self, text="-------------AAA")
+            btn = tk.Button(self, text="-------------AAA", font=tkfont.Font(size=15))
             # btn = tk.Button(self, textvariable=btn_text)
             # self.selections[i].command =
             self.selections.append(btn)
-            btn.pack()
+            btn.pack(fill='both', expand=1)
 
         self.create_quiz("init")
 
@@ -129,8 +131,6 @@ class IntroPage(tk.Frame):
         wilds = []
         self.answer_wild = select_answer_wild()
         # import pdb; pdb.set_trace()
-        if(arg != "init"):
-            self.play()
 
         correct_answer = "%s %s" % (self.answer_wild.title, self.answer_wild.artist)
         wilds.append(self.answer_wild)
@@ -142,13 +142,17 @@ class IntroPage(tk.Frame):
         i = 0
         for wild in wilds:
             answer = "%s %s" % (wild.title, wild.artist)
+            text = "%s\n%s" % (wild.title, wild.artist)
             self.selections[i].config(text= answer)
             self.selections[i].config(command= (lambda ans_str=answer: self.ans(ans_str)))
             i += 1
 
+        if(arg != "init"):
+            self.play()
+
+
     # 回答する
     def ans(self, answer):
-        # TODO 正解不正解をと正しい答えを次のページに受け渡す
         print(answer)
         if(answer == self.answer_wild.title + " " + self.answer_wild.artist):
             print("正解！！")
@@ -159,7 +163,7 @@ class IntroPage(tk.Frame):
         self.controller.sum_quiz_num += 1
 
         if(self.controller.is_end()):
-            self.controller.show_frame("ResultPage", "play")
+            self.controller.show_frame("ResultPage")
         else:
             self.controller.show_frame("IntroPage", "play")
 
@@ -172,15 +176,34 @@ class IntroPage(tk.Frame):
 
 
 class ResultPage(tk.Frame):
-
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        label = tk.Label(self, text="This is page 2", font=controller.title_font)
+        label = tk.Label(self, text="結果発表", font=controller.title_font)
         label.pack(side="top", fill="x", pady=10)
-        button = tk.Button(self, text="Go to the start page",
+
+        self.label2 = tk.Label(self, text="", font=controller.title_font)
+        self.label2.pack(side="top", fill="x", pady=10)
+
+        self.label3 = tk.Label(self, text="", font=controller.title_font)
+        self.label3.pack(side="top", fill="x", pady=10)
+
+        button = tk.Button(self, text="スタートに戻る",
                            command=lambda: controller.show_frame("StartPage"))
         button.pack()
+
+    def show_result(self):
+        result = "残念！"
+        if(self.controller.correction_num >= 5):
+            result = "You are WILD!!!"
+        self.label2.config(text=result)
+        # import pdb; pdb.set_trace()
+
+        detail = "%s/%s正解" % (self.controller.correction_num, self.controller.sum_quiz_num)
+        self.label3.config(text=detail)
+
+        self.controller.correction_num = 0
+        self.controller.sum_quiz_num = 0
 
 
 if __name__ == "__main__":
