@@ -64,7 +64,7 @@ class SampleApp(tk.Tk):
         self.show_frame("StartPage")
 
     def is_end(self):
-        if(self.correction_num >= 5 or self.sum_quiz_num >= 2):
+        if(self.correction_num >= 5 or self.sum_quiz_num >= 10):
             return True
         else:
             return False
@@ -98,8 +98,8 @@ class IntroPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        label = tk.Label(self, text="どのGet Wildでしょうか", font=controller.title_font)
-        label.pack(side="top", fill="x", pady=10)
+        self.label = tk.Label(self, text="どのGet Wildでしょうか", font=controller.title_font)
+        self.label.pack(side="top", fill="x", pady=10)
 
         self.btn_play = tk.Button(self, text="Play wild", command= self.play)
 
@@ -116,7 +116,7 @@ class IntroPage(tk.Frame):
             # btn_text = tk.StringVar()
             # btn_text.set("-------------AAA")
             # self.selection_texts.append(btn_text)
-            btn = tk.Button(self, text="-------------AAA", font=tkfont.Font(size=15))
+            btn = tk.Button(self, text="-------------AAA", pady=10, font=tkfont.Font(size=15))
             # btn = tk.Button(self, textvariable=btn_text)
             # self.selections[i].command =
             self.selections.append(btn)
@@ -149,23 +149,33 @@ class IntroPage(tk.Frame):
 
         if(arg != "init"):
             self.play()
+            # import pdb; pdb.set_trace()
+            # else:
+            text = "%s問中%s正解" % (self.controller.sum_quiz_num, self.controller.correction_num)
+            if(arg == "correct"):
+                self.label.config(text= "正解！！！" + text)
+            elif(arg == "incorrect"):
+                self.label.config(text= "不正解！！"+ text)
 
 
     # 回答する
     def ans(self, answer):
+        result = "correct"
         print(answer)
         if(answer == self.answer_wild.title + " " + self.answer_wild.artist):
             print("正解！！")
+            result = "correct"
             self.controller.correction_num += 1
         else:
+            result = "incorrect"
             print("不正解")
 
         self.controller.sum_quiz_num += 1
-
+        print(result)
         if(self.controller.is_end()):
             self.controller.show_frame("ResultPage")
         else:
-            self.controller.show_frame("IntroPage", "play")
+            self.controller.show_frame("IntroPage", result)
 
         return "answer"
 
