@@ -56,9 +56,6 @@ class SampleApp(tk.Tk):
             frame = F(parent=container, controller=self)
             self.frames[page_name] = frame
 
-            # put all of the pages in the same location;
-            # the one on the top of the stacking order
-            # will be the one that is visible.
             frame.grid(row=0, column=0, sticky="nsew")
 
         self.show_frame("StartPage")
@@ -87,12 +84,12 @@ class StartPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        label = tk.Label(self, text="Get Wild イントロ", font=controller.title_font)
+        label = tk.Label(self, text="Get Wild and Intro", font=controller.title_font)
         label.pack(side="top", fill="x", pady=10)
 
         button2 = tk.Button(self, text="Start", font=tkfont.Font(size=20),
                             command=lambda: controller.show_frame("IntroPage", "play"))
-        button2.pack(fill='y', expand=1)
+        button2.pack(fill='both', expand=1)
 
 
 class IntroPage(tk.Frame):
@@ -103,7 +100,7 @@ class IntroPage(tk.Frame):
         self.label = tk.Label(self, text="どのGet Wildでしょうか", font=controller.title_font)
         self.label.pack(side="top", fill="x", pady=10)
 
-        self.btn_play = tk.Button(self, text="Play wild", command= self.play)
+        self.btn_play = tk.Button(self, text="Replay", command= self.play, font=tkfont.Font(size=15))
 
         # if(self.btn_play.winfo_exists() == False):
         self.btn_play.pack()
@@ -118,7 +115,7 @@ class IntroPage(tk.Frame):
             # btn_text = tk.StringVar()
             # btn_text.set("-------------AAA")
             # self.selection_texts.append(btn_text)
-            btn = tk.Button(self, text="-------------", pady=10, font=tkfont.Font(size=15))
+            btn = tk.Button(self, text="-------------", pady=10, font=tkfont.Font(size=12))
             # btn = tk.Button(self, textvariable=btn_text)
             # self.selections[i].command =
             self.selections.append(btn)
@@ -145,7 +142,7 @@ class IntroPage(tk.Frame):
         for wild in wilds:
             answer = "%s %s" % (wild.title, wild.artist)
             text = "%s\n%s" % (wild.title, wild.artist)
-            self.selections[i].config(text= answer)
+            self.selections[i].config(text= text)
             self.selections[i].config(command= (lambda ans_str=answer: self.ans(ans_str)))
             i += 1
 
@@ -191,22 +188,23 @@ class MiddlePage(tk.Frame):
         self.label2.pack(side="top", fill="x", pady=10)
         #
         self.label3 = tk.Label(self, text="", font=controller.title_font)
-        self.label3.pack(side="top", fill="x", pady=10)
+        self.label3.pack(side="top", fill="both", pady=10)
 
         self.label4 = tk.Label(self, text="でした", font=controller.title_font)
         self.label4.pack(side="top", fill="x", pady=10)
 
-        button = tk.Button(self, text="Next",
+        button = tk.Button(self, text="Next", font=tkfont.Font(size=15),
                            command=lambda: controller.show_frame("IntroPage"))
-        button.pack()
+        button.pack(fill='both', expand=1)
 
     def show_result(self, result, ans):
         text = "%s問中%s正解" % (self.controller.sum_quiz_num, self.controller.correction_num)
         if(result == "correct"):
-            self.label.config(text= "正解！！！" + text)
+            self.label.config(text=("正解！！！" + text) , fg="blue")
         elif(result == "incorrect"):
-            self.label.config(text= "不正解！！"+ text)
-        self.label3.config(text=ans)
+            self.label.config(text=("不正解！！"+ text), fg="red")
+        dst = ans.replace(' ', '\n')
+        self.label3.config(text=dst)
 
 
 class ResultPage(tk.Frame):
@@ -242,8 +240,8 @@ class ResultPage(tk.Frame):
 
 if __name__ == "__main__":
     app = SampleApp()
-    app.overrideredirect(True)
-    app.overrideredirect(False)
+    # app.overrideredirect(True)
+    # app.overrideredirect(False)
     app.attributes('-fullscreen',True)
     app.mainloop()
     # app.geometry("400x300")
